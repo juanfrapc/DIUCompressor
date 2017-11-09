@@ -1,6 +1,7 @@
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Iterator;
@@ -10,28 +11,32 @@ import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
-public class CompressorStream extends SwingWorker<Object, Object> {
+public class CompressorStream extends SwingWorker<Boolean, Object[]> {
 
     private final int BUFFER_SIZE = 200;
     private final JProgressBar bar;
     private final JLabel label;
-    private final List files;
+    private List files = null;
+    private String destination = null;
 
     public CompressorStream(JProgressBar bar, JLabel label, List files) {
         this.bar = bar;
         this.label = label;
-        this.files = files;
     }
 
 
     @Override
-    protected Object doInBackground() throws Exception {
+    protected Boolean doInBackground() throws Exception {
         try {
+            //Inicializamos contadores
+            
             // Objeto para referenciar a los archivos que queremos comprimir
             BufferedInputStream origin = null;
+            
             // Objeto para referenciar el archivo zip de salida
             FileOutputStream dest = new FileOutputStream("c:\\folder.zip");
             ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest));
+            
             // Buffer de transferencia para mandar datos a comprimir
             byte[] data = new byte[BUFFER_SIZE];
             Iterator i = files.iterator();
@@ -56,6 +61,17 @@ public class CompressorStream extends SwingWorker<Object, Object> {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    protected void process(List<Object[]> chunks) {
+        
+    }
+    
+    public final void compress(List<File> files, String destPath){
+        this.files = files;
+        this.destination = destPath;
+        this.execute();
     }
 
 }
