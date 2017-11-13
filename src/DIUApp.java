@@ -3,6 +3,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
 /*
@@ -10,7 +11,6 @@ import javax.swing.filechooser.FileFilter;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author Entrar
@@ -19,7 +19,6 @@ public class DIUApp extends javax.swing.JFrame {
 
     private CompressorStream cS;
     private List<File> fileList;
-
 
     /**
      * Creates new form DIUApp
@@ -46,19 +45,18 @@ public class DIUApp extends javax.swing.JFrame {
         destTextField = new javax.swing.JTextField();
         destSelectionButton = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
-        progressBar = new javax.swing.JProgressBar();
-        actualFileLabel = new javax.swing.JLabel();
+        totalProgressBar = new javax.swing.JProgressBar();
         startButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
+        fileProgressBar = new javax.swing.JProgressBar();
+        scrollPane = new javax.swing.JScrollPane();
+        progressArea = new javax.swing.JTextArea();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("DIU Compressor");
-        setMinimumSize(new java.awt.Dimension(570, 249));
-        addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentResized(java.awt.event.ComponentEvent evt) {
-                formComponentResized(evt);
-            }
-        });
+        setMinimumSize(new java.awt.Dimension(570, 400));
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Input"));
 
@@ -114,9 +112,9 @@ public class DIUApp extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        progressBar.setToolTipText("Progress");
+        jPanel2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
-        actualFileLabel.setText("Progress:");
+        totalProgressBar.setToolTipText("Progress");
 
         startButton.setText("Start compression");
         startButton.addActionListener(new java.awt.event.ActionListener() {
@@ -133,6 +131,17 @@ public class DIUApp extends javax.swing.JFrame {
             }
         });
 
+        progressArea.setEditable(false);
+        progressArea.setColumns(20);
+        progressArea.setRows(5);
+        progressArea.setText("Progress:");
+        progressArea.setEnabled(false);
+        scrollPane.setViewportView(progressArea);
+
+        jLabel3.setText("File compression progress");
+
+        jLabel4.setText("Overall progress");
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -140,75 +149,102 @@ public class DIUApp extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(progressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(totalProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(startButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(startButton, javax.swing.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(cancelButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(actualFileLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 550, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(cancelButton, javax.swing.GroupLayout.DEFAULT_SIZE, 262, Short.MAX_VALUE))
+                    .addComponent(fileProgressBar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(scrollPane)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel4))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(13, 13, 13)
+                .addGap(4, 4, 4)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(startButton)
                     .addComponent(cancelButton))
-                .addGap(18, 18, 18)
-                .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(actualFileLabel)
-                .addContainerGap(25, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel3)
+                .addGap(2, 2, 2)
+                .addComponent(fileProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(5, 5, 5)
+                .addComponent(jLabel4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(totalProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE)
+                .addContainerGap())
         );
+
+        jPanel2Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {fileProgressBar, totalProgressBar});
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void originSelectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_originSelectionButtonActionPerformed
-        String path  = getDirectoryPath();
+        String path = getDirectoryPath();
         originTextField.setText(path);
     }//GEN-LAST:event_originSelectionButtonActionPerformed
 
     private void destSelectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_destSelectionButtonActionPerformed
-        String path  = getDirectoryPath();
+        String path = getDirectoryPath();
         destTextField.setText(path);
-        progressBar.setMaximum(5);
+        totalProgressBar.setMaximum(5);
     }//GEN-LAST:event_destSelectionButtonActionPerformed
 
     private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
-        //List<File> fileList =  getFileList(originTextField.getText());
-        fileList =  getFileList("C:\\Users\\Granfran\\Desktop\\Informática\\4º\\DIU\\practica 8\\a comprimir");
-        cS = new CompressorStream(progressBar, actualFileLabel);
-        cS.compress(fileList, getZipName("C:\\Users\\Granfran\\Desktop\\Informática\\4º\\DIU\\practica 8\\", fileList.get(0)));
+        if (!checkInputData()) {
+            return;
+        }
+        fileList = getFileList(originTextField.getText());
+        if (fileList.isEmpty()) {
+            showError("Origin folder is empty");
+            return;
+        }
+        //fileList =  getFileList("C:\\Users\\Granfran\\Desktop\\Informática\\4º\\DIU\\practica 8\\a comprimir");
+        cS = new CompressorStream(totalProgressBar, progressArea, fileProgressBar);
+        cS.compress(fileList, getZipName(destTextField.getText(), fileList.get(0)));
+        //cS.compress(fileList, getZipName("C:\\Users\\Granfran\\Desktop\\Informática\\4º\\DIU\\practica 8\\", fileList.get(0)));
+        progressArea.setEnabled(true);
+        progressArea.setText("");
+        fileProgressBar.setStringPainted(true);
+        totalProgressBar.setStringPainted(true);
         cancelButton.setEnabled(true);
         startButton.setEnabled(false);
     }//GEN-LAST:event_startButtonActionPerformed
 
-    private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
-        actualFileLabel.setSize(this.getWidth() - 20, actualFileLabel.getHeight());
-        actualFileLabel.repaint();
-    }//GEN-LAST:event_formComponentResized
-
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         boolean cancel = cS.cancel(true);
         if (cancel) {
-            actualFileLabel.setText("Progress: Canceled");
+            fileProgressBar.setValue(0);
+            totalProgressBar.setValue(0);
         }
         File file = new File(getZipName("C:\\Users\\Granfran\\Desktop\\Informática\\4º\\DIU\\practica 8\\", fileList.get(0)));
         file.delete();
@@ -252,24 +288,28 @@ public class DIUApp extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel actualFileLabel;
     private javax.swing.JButton cancelButton;
     private javax.swing.JButton destSelectionButton;
     private javax.swing.JTextField destTextField;
+    private javax.swing.JProgressBar fileProgressBar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JButton originSelectionButton;
     private javax.swing.JTextField originTextField;
-    private javax.swing.JProgressBar progressBar;
+    private javax.swing.JTextArea progressArea;
+    private javax.swing.JScrollPane scrollPane;
     private javax.swing.JButton startButton;
+    private javax.swing.JProgressBar totalProgressBar;
     // End of variables declaration//GEN-END:variables
 
     private String getDirectoryPath() {
         JFileChooser fc = new JFileChooser("..");
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-         
+
         fc.setFileFilter(getDirectoryFilter());
         int open = fc.showOpenDialog(rootPane);
         if (open == JFileChooser.APPROVE_OPTION) {
@@ -280,16 +320,16 @@ public class DIUApp extends javax.swing.JFrame {
 
     private FileFilter getDirectoryFilter() {
         return new FileFilter() {
-             @Override
-             public boolean accept(File f) {
-                 return f.isDirectory();
-             }
+            @Override
+            public boolean accept(File f) {
+                return f.isDirectory();
+            }
 
-             @Override
-             public String getDescription() {
-                 return "Directories";
-             }
-         };
+            @Override
+            public String getDescription() {
+                return "Directories";
+            }
+        };
     }
 
     private List<File> getFileList(String path) {
@@ -305,10 +345,36 @@ public class DIUApp extends javax.swing.JFrame {
     }
 
     private String getZipName(String path, File file) {
-        if (path.endsWith(".zip")){
+        if (path.endsWith(".zip")) {
             return path;
-        }else{
+        } else {
             return path + file.getName().split("\\.")[0] + ".zip";
         }
+    }
+
+    private void showError(String error) {
+        JOptionPane.showMessageDialog(this,
+                error,
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+    }
+
+    private boolean checkInputData() {
+        File origin = new File(originTextField.getText());
+        File destination = new File(destTextField.getText());
+        
+        if (!origin.exists() || !origin.canRead()) {
+            showError("Problem with origin folder. Doesn`t exists or doesn't have read permission");
+            return false;
+        }
+        if (!destination.exists() || !destination.canWrite()) {
+            showError("Problem with destination folder. Doesn`t exists or doesn't have write permission");
+            return false;
+        }
+        if (origin.equals(destination)) {
+            showError("Origin and destination folder should be different");
+            return false;
+        }
+        return true;
     }
 }
