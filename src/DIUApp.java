@@ -1,7 +1,13 @@
 
+import java.awt.Dimension;
+import java.awt.Image;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
@@ -19,13 +25,25 @@ public class DIUApp extends javax.swing.JFrame {
 
     private CompressorStream cS;
     private List<File> fileList;
+    private final Dimension minimumFrameSizeCollapsed;
+    private Dimension minimumFrameSizeExpanded;
 
     /**
      * Creates new form DIUApp
      */
     public DIUApp() {
         initComponents();
+        try {
+            this.setIconImage(ImageIO.read(new File("./src/icon/zipIcon.png")));
+        } catch (IOException ex) {
+            Logger.getLogger(DIUApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
         this.setLocationRelativeTo(null);
+        scrollPane.setVisible(false);
+        minimumFrameSizeCollapsed = this.getMinimumSize();
+        minimumFrameSizeExpanded = new Dimension(minimumFrameSizeCollapsed.width,
+                minimumFrameSizeCollapsed.height + scrollPane.getHeight());
+        this.pack();
     }
 
     /**
@@ -53,6 +71,8 @@ public class DIUApp extends javax.swing.JFrame {
         progressArea = new javax.swing.JTextArea();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
+        seeMoreButton = new javax.swing.JToggleButton();
+        jSeparator1 = new javax.swing.JSeparator();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("DIU Compressor");
@@ -142,25 +162,37 @@ public class DIUApp extends javax.swing.JFrame {
 
         jLabel4.setText("Overall progress");
 
+        seeMoreButton.setText("See More");
+        seeMoreButton.setPreferredSize(new java.awt.Dimension(85, 23));
+        seeMoreButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                seeMoreButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(totalProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(totalProgressBar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
                         .addComponent(startButton, javax.swing.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(cancelButton, javax.swing.GroupLayout.DEFAULT_SIZE, 262, Short.MAX_VALUE))
-                    .addComponent(fileProgressBar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(scrollPane)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
+                    .addComponent(fileProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(scrollPane, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel3)
                             .addComponent(jLabel4))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(seeMoreButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -178,8 +210,12 @@ public class DIUApp extends javax.swing.JFrame {
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(totalProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(seeMoreButton, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -246,11 +282,25 @@ public class DIUApp extends javax.swing.JFrame {
             fileProgressBar.setValue(0);
             totalProgressBar.setValue(0);
         }
-        File file = new File(getZipName("C:\\Users\\Granfran\\Desktop\\Informática\\4º\\DIU\\practica 8\\", fileList.get(0)));
+        File file = new File(getZipName(destTextField.getText(), fileList.get(0)));
         file.delete();
         startButton.setEnabled(true);
         cancelButton.setEnabled(false);
     }//GEN-LAST:event_cancelButtonActionPerformed
+
+    private void seeMoreButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_seeMoreButtonActionPerformed
+        if (seeMoreButton.isSelected()) {
+            scrollPane.setVisible(true);
+            this.setMinimumSize(this.getSize());
+            this.pack();
+            this.setMinimumSize(minimumFrameSizeExpanded);
+        } else {
+            scrollPane.setVisible(false);
+            this.setMinimumSize(new Dimension(this.getWidth(), 0));
+            this.pack();
+            this.setMinimumSize(minimumFrameSizeCollapsed);
+        }
+    }//GEN-LAST:event_seeMoreButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -298,10 +348,12 @@ public class DIUApp extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JButton originSelectionButton;
     private javax.swing.JTextField originTextField;
     private javax.swing.JTextArea progressArea;
     private javax.swing.JScrollPane scrollPane;
+    private javax.swing.JToggleButton seeMoreButton;
     private javax.swing.JButton startButton;
     private javax.swing.JProgressBar totalProgressBar;
     // End of variables declaration//GEN-END:variables
@@ -362,7 +414,7 @@ public class DIUApp extends javax.swing.JFrame {
     private boolean checkInputData() {
         File origin = new File(originTextField.getText());
         File destination = new File(destTextField.getText());
-        
+
         if (!origin.exists() || !origin.canRead()) {
             showError("Problem with origin folder. Doesn`t exists or doesn't have read permission");
             return false;
